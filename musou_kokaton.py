@@ -300,7 +300,6 @@ def main():
             return
 
         bird.update(key_lst, screen)
-        print(bird.speed)
         beams.update()
         beams.draw(screen)
         emys.update()

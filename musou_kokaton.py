@@ -71,9 +71,11 @@ class Bird(pg.sprite.Sprite):
         self.image = self.imgs[self.dire]
         self.rect = self.image.get_rect()
         self.rect.center = xy
+ C0A22026/feature1
         self.speed = 10
         self.state = "normal"
         self.hyper_life = -1
+  main
 
     def change_img(self, num: int, screen: pg.Surface):
         """
@@ -371,6 +373,12 @@ C0A22002/feature4
 
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 beams.add(Beam(bird))
+C0A22026/feature1
+            if event.type == pg.KEYDOWN and event.key == pg.K_LSHIFT:
+                bird.speed = 20
+            if event.type != pg.KEYDOWN:
+                bird.speed = 10
+            
 C0A21082/feature6
             if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
                 if score.score >= 200 and len(neog) == 0:
@@ -398,9 +406,10 @@ C0B21181/feature3
                 if score.score >= 50 and len(shields) == 0:
                     score.score_up(-50)
                     shields.add(Shield(bird, 400))
- main
- main
- main
+main
+main
+main
+main
 main
         screen.blit(bg_img, [0, 0])
 

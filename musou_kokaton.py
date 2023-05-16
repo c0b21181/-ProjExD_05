@@ -71,6 +71,8 @@ class Bird(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = xy
         self.speed = 10
+        self.state = "normal"
+        self.hyper_life = -1
 
     def change_img(self, num: int, screen: pg.Surface):
         """
@@ -80,6 +82,16 @@ class Bird(pg.sprite.Sprite):
         """
         self.image = pg.transform.rotozoom(pg.image.load(f"ex04/fig/{num}.png"), 0, 2.0)
         screen.blit(self.image, self.rect)
+
+    def change_state(self, state: str, hyper_life: int):
+        """
+        こうかとんの状態を切り替える
+        引数1 state：こうかとんの状態（normal or hyper）
+        引数2 hyper_life：ハイパーモードの発動時間
+        """
+        self.state = state
+        self.hyper_life = hyper_life
+
 
     def update(self, key_lst: list[bool], screen: pg.Surface):
         """
@@ -100,11 +112,17 @@ class Bird(pg.sprite.Sprite):
         if not (sum_mv[0] == 0 and sum_mv[1] == 0):
             self.dire = tuple(sum_mv)
             self.image = self.imgs[self.dire]
+        if self.state == "hyper":
+            self.image = pg.transform.laplacian(self.image)
+            self.hyper_life -= 1
+        if self.hyper_life < 0:
+            self.change_state("normal", -1)
         screen.blit(self.image, self.rect)
     
     def get_direction(self) -> tuple[int, int]:
         return self.dire
     
+
 
 class Bomb(pg.sprite.Sprite):
     """
@@ -270,6 +288,10 @@ def main():
                 return 0
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 beams.add(Beam(bird))
+            if event.type == pg.KEYDOWN and event.key == pg.K_RSHIFT:
+                if score.score > 100:
+                    bird.change_state("hyper", 500)
+                    score.score_up(-100)
         screen.blit(bg_img, [0, 0])
 
         if tmr%200 == 0:  # 200フレームに1回，敵機を出現させる
@@ -289,12 +311,16 @@ def main():
             exps.add(Explosion(bomb, 50))  # 爆発エフェクト
             score.score_up(1)  # 1点アップ
 
-        if len(pg.sprite.spritecollide(bird, bombs, True)) != 0:
-            bird.change_img(8, screen) # こうかとん悲しみエフェクト
-            score.update(screen)
-            pg.display.update()
-            time.sleep(2)
-            return
+        for bomb in pg.sprite.spritecollide(bird, bombs, True):
+            if bird.state == "hyper":
+                exps.add(Explosion(bomb, 50))  # 爆発エフェクト
+                score.score_up(1)  # 1up
+            else:
+                bird.change_img(8, screen) # こうかとん悲しみエフェクト
+                score.update(screen)
+                pg.display.update()
+                time.sleep(2)
+                return
 
         bird.update(key_lst, screen)
         beams.update()

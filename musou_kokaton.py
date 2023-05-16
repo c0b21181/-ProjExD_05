@@ -4,6 +4,7 @@ import sys
 import time
 
 import pygame as pg
+from pygame.sprite import AbstractGroup
 
 
 WIDTH = 1600  # ゲームウィンドウの幅
@@ -238,6 +239,22 @@ class Explosion(pg.sprite.Sprite):
             self.kill()
 
 
+class NeoGravity(pg.sprite.Sprite):
+    def __init__(self, life: int):
+        super().__init__()
+        self.image = pg.Surface((1600,900),flags=pg.SRCALPHA)
+        pg.draw.rect(self.image,(0,0,0,100),(0,0,1600,900))
+        self.rect = self.image.get_rect()
+        self.life = life
+    
+    def update(self):
+        self.life -= 1
+        if self.life < 0:
+            
+            self.kill()
+
+
+
 class Enemy(pg.sprite.Sprite):
     """
     敵機に関するクラス
@@ -328,10 +345,14 @@ def main():
     beams = pg.sprite.Group()
     exps = pg.sprite.Group()
     emys = pg.sprite.Group()
+ C0A21082/feature6
+    neog = pg.sprite.Group()
+
  C0A22102/feature5
     gbb = pg.sprite.Group()
 
     shields = pg.sprite.Group()
+main
 main
 
     tmr = 0
@@ -350,6 +371,14 @@ C0A22002/feature4
 
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 beams.add(Beam(bird))
+C0A21082/feature6
+            if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
+                if score.score >= 200 and len(neog) == 0:
+                    score.score -= 200
+                    bird.change_img(6, screen)
+                    neog.add(NeoGravity(400))
+                
+
  C0A22102/feature5
             if event.type == pg.KEYDOWN and event.key == pg.K_TAB and score.score>=50:
                 score.score-=50
@@ -372,6 +401,7 @@ C0B21181/feature3
  main
  main
  main
+main
         screen.blit(bg_img, [0, 0])
 
 
@@ -392,6 +422,13 @@ C0B21181/feature3
             exps.add(Explosion(bomb, 50))  # 爆発エフェクト
             score.score_up(1)  # 1点アップ
 
+C0A21082/feature6
+        for bomb in pg.sprite.groupcollide(bombs, neog, True, False).keys():
+            exps.add(Explosion(bomb,50))
+
+        for emy in pg.sprite.groupcollide(emys, neog, True, False).keys():
+            exps.add(Explosion(emy,100))
+
  C0A22102/feature5
         for bomb in pg.sprite.groupcollide(bombs, gbb, True, False).keys():
             exps.add(Explosion(bomb, 50))  # 爆発エフェクト
@@ -408,6 +445,7 @@ C0B21181/feature3
                 pg.display.update()
                 time.sleep(2)
                 return
+ main
  main
 
         if len(pg.sprite.spritecollide(bird, bombs, True)) != 0:
@@ -438,6 +476,8 @@ C0B21181/feature3
         shields.draw(screen)
         exps.update()
         exps.draw(screen)
+        neog.update()
+        neog.draw(screen)
         score.update(screen)
         
         pg.display.update()

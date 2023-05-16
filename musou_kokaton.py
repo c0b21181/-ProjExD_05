@@ -4,6 +4,7 @@ import sys
 import time
 
 import pygame as pg
+from pygame.sprite import AbstractGroup
 
 
 WIDTH = 1600  # ゲームウィンドウの幅
@@ -199,6 +200,22 @@ class Explosion(pg.sprite.Sprite):
             self.kill()
 
 
+class NeoGravity(pg.sprite.Sprite):
+    def __init__(self, life: int):
+        super().__init__()
+        self.image = pg.Surface((1600,900),flags=pg.SRCALPHA)
+        pg.draw.rect(self.image,(0,0,0,100),(0,0,1600,900))
+        self.rect = self.image.get_rect()
+        self.life = life
+    
+    def update(self):
+        self.life -= 1
+        if self.life < 0:
+            
+            self.kill()
+
+
+
 class Enemy(pg.sprite.Sprite):
     """
     敵機に関するクラス
@@ -260,6 +277,7 @@ def main():
     beams = pg.sprite.Group()
     exps = pg.sprite.Group()
     emys = pg.sprite.Group()
+    neog = pg.sprite.Group()
 
     tmr = 0
     clock = pg.time.Clock()
@@ -270,6 +288,12 @@ def main():
                 return 0
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 beams.add(Beam(bird))
+            if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
+                if score.score >= 200 and len(neog) == 0:
+                    score.score -= 200
+                    bird.change_img(6, screen)
+                    neog.add(NeoGravity(400))
+                
         screen.blit(bg_img, [0, 0])
 
         if tmr%200 == 0:  # 200フレームに1回，敵機を出現させる
@@ -289,6 +313,12 @@ def main():
             exps.add(Explosion(bomb, 50))  # 爆発エフェクト
             score.score_up(1)  # 1点アップ
 
+        for bomb in pg.sprite.groupcollide(bombs, neog, True, False).keys():
+            exps.add(Explosion(bomb,50))
+
+        for emy in pg.sprite.groupcollide(emys, neog, True, False).keys():
+            exps.add(Explosion(emy,100))
+
         if len(pg.sprite.spritecollide(bird, bombs, True)) != 0:
             bird.change_img(8, screen) # こうかとん悲しみエフェクト
             score.update(screen)
@@ -305,6 +335,8 @@ def main():
         bombs.draw(screen)
         exps.update()
         exps.draw(screen)
+        neog.update()
+        neog.draw(screen)
         score.update(screen)
         pg.display.update()
         tmr += 1

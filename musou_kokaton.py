@@ -71,11 +71,10 @@ class Bird(pg.sprite.Sprite):
         self.image = self.imgs[self.dire]
         self.rect = self.image.get_rect()
         self.rect.center = xy
- C0A22026/feature1
         self.speed = 10
         self.state = "normal"
         self.hyper_life = -1
-  main
+
 
     def change_img(self, num: int, screen: pg.Surface):
         """
@@ -347,15 +346,11 @@ def main():
     beams = pg.sprite.Group()
     exps = pg.sprite.Group()
     emys = pg.sprite.Group()
- C0A21082/feature6
     neog = pg.sprite.Group()
 
- C0A22102/feature5
     gbb = pg.sprite.Group()
 
     shields = pg.sprite.Group()
-main
-main
 
     tmr = 0
     clock = pg.time.Clock()
@@ -364,7 +359,6 @@ main
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return 0
-C0A22002/feature4
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:    
                 if event.type == pg.KEYDOWN and event.key == pg.K_SPACE and key_lst[pg.K_LSHIFT]:
                     beams.add(NeoBeam(bird, 5).gen_beams(bird))
@@ -373,13 +367,11 @@ C0A22002/feature4
 
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 beams.add(Beam(bird))
-C0A22026/feature1
             if event.type == pg.KEYDOWN and event.key == pg.K_LSHIFT:
                 bird.speed = 20
             if event.type != pg.KEYDOWN:
                 bird.speed = 10
             
-C0A21082/feature6
             if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
                 if score.score >= 200 and len(neog) == 0:
                     score.score -= 200
@@ -387,7 +379,6 @@ C0A21082/feature6
                     neog.add(NeoGravity(400))
                 
 
- C0A22102/feature5
             if event.type == pg.KEYDOWN and event.key == pg.K_TAB and score.score>=50:
                 score.score-=50
                 gbb.add(Gravity(bird, 200, 500))
@@ -396,7 +387,6 @@ C0A21082/feature6
             if event.type == pg.KEYDOWN and event.key == pg.K_BACKSPACE:
                 emys.add(Enemy())
 
-C0B21181/feature3
             if event.type == pg.KEYDOWN and event.key == pg.K_RSHIFT:
                 if score.score > 100:
                     bird.change_state("hyper", 500)
@@ -406,11 +396,6 @@ C0B21181/feature3
                 if score.score >= 50 and len(shields) == 0:
                     score.score_up(-50)
                     shields.add(Shield(bird, 400))
-main
-main
-main
-main
-main
         screen.blit(bg_img, [0, 0])
 
 
@@ -431,19 +416,16 @@ main
             exps.add(Explosion(bomb, 50))  # 爆発エフェクト
             score.score_up(1)  # 1点アップ
 
-C0A21082/feature6
         for bomb in pg.sprite.groupcollide(bombs, neog, True, False).keys():
             exps.add(Explosion(bomb,50))
 
         for emy in pg.sprite.groupcollide(emys, neog, True, False).keys():
             exps.add(Explosion(emy,100))
 
- C0A22102/feature5
         for bomb in pg.sprite.groupcollide(bombs, gbb, True, False).keys():
             exps.add(Explosion(bomb, 50))  # 爆発エフェクト
             #score.score_up(1)  # 1点アップ
 
-C0B21181/feature3
         for bomb in pg.sprite.spritecollide(bird, bombs, True):
             if bird.state == "hyper":
                 exps.add(Explosion(bomb, 50))  # 爆発エフェクト
@@ -454,8 +436,6 @@ C0B21181/feature3
                 pg.display.update()
                 time.sleep(2)
                 return
- main
- main
 
         if len(pg.sprite.spritecollide(bird, bombs, True)) != 0:
             bird.change_img(8, screen) # こうかとん悲しみエフェクト
@@ -463,7 +443,6 @@ C0B21181/feature3
             pg.display.update()
             time.sleep(2)
             return
- C0A22102/feature5
         gbb.update(bird)
         gbb.draw(screen)
 
@@ -471,9 +450,7 @@ C0B21181/feature3
         for bomb in pg.sprite.groupcollide(bombs, shields, True, False).keys():
             exps.add(Explosion(bomb, 50))  # 爆発エフェクト
             score.score_up(1)  # 1点アップ
- main
 
- main
         bird.update(key_lst, screen)
         beams.update()
         beams.draw(screen)

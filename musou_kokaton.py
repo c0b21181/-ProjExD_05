@@ -104,6 +104,26 @@ class Bird(pg.sprite.Sprite):
     
     def get_direction(self) -> tuple[int, int]:
         return self.dire
+
+
+class Shield(pg.sprite.Sprite):
+    """
+    防御壁に関するクラス
+    """
+    def __init__(self, bird: Bird, life: int):
+        super().__init__()
+        self.image = pg.Surface((20, bird.rect.height * 2))
+        pg.draw.rect(self.image, (0, 0, 0), pg.Rect(0, 0, 20, bird.rect.height * 2))
+        self.rect = self.image.get_rect()
+        self.rect.centerx = bird.rect.centerx + 70
+        self.rect.centery = bird.rect.centery + 50
+        self.life = life
+
+    def update(self):
+        self.life -= 1
+        if self.life <= 0:
+            self.kill()
+
     
 
 class Bomb(pg.sprite.Sprite):
@@ -260,6 +280,7 @@ def main():
     beams = pg.sprite.Group()
     exps = pg.sprite.Group()
     emys = pg.sprite.Group()
+    shields = pg.sprite.Group()
 
     tmr = 0
     clock = pg.time.Clock()
@@ -270,7 +291,12 @@ def main():
                 return 0
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 beams.add(Beam(bird))
+            if event.type == pg.KEYDOWN and event.key == pg.K_CAPSLOCK:
+                if score.score >= 50 and len(shields) == 0:
+                    score.score_up(-50)
+                    shields.add(Shield(bird, 400))
         screen.blit(bg_img, [0, 0])
+
 
         if tmr%200 == 0:  # 200フレームに1回，敵機を出現させる
             emys.add(Enemy())
@@ -295,6 +321,10 @@ def main():
             pg.display.update()
             time.sleep(2)
             return
+        
+        for bomb in pg.sprite.groupcollide(bombs, shields, True, False).keys():
+            exps.add(Explosion(bomb, 50))  # 爆発エフェクト
+            score.score_up(1)  # 1点アップ
 
         bird.update(key_lst, screen)
         beams.update()
@@ -303,6 +333,8 @@ def main():
         emys.draw(screen)
         bombs.update()
         bombs.draw(screen)
+        shields.update()
+        shields.draw(screen)
         exps.update()
         exps.draw(screen)
         score.update(screen)
